@@ -1,0 +1,31 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Compra realizada — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<div class="compra-exitosa">
+    <div class="compra-icono">✅</div>
+    <h2>¡Compra realizada con éxito!</h2>
+    <p class="compra-sub">Gracias por tu compra, {{ username }}. Tu pedido ha sido procesado.</p>
+
+    <div class="compra-detalle">
+        <h3>Resumen de tu compra</h3>
+        {% for item in items %}
+        <div class="compra-item">
+            <div class="compra-info">
+                <div class="compra-nombre">{{ item.nombre }}</div>
+                <div class="compra-cant">{{ item.cantidad }} x ${{ item.precio|floatformat:0 }}</div>
+            </div>
+            <div class="compra-subtotal">${{ item.subtotal|floatformat:0 }}</div>
+        </div>
+        {% endfor %}
+
+        <div class="compra-total">
+            <span>Total pagado:</span>
+            <strong>${{ total|floatformat:0 }}</strong>
+        </div>
+    </div>
+
+    <a href="{% url 'catalogo:lista' %}" class="btn-submit" style="text-align:center; display:block; text-decoration:none; margin-top:1.5rem;">Volver al catálogo</a>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "catalogo/base.html" %}
+{% load static %}
+
+{% block title %}Catálogo — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<div class="resumen">
+    <div class="resumen-item">
+        <span class="numero">{{ total }}</span>
+        <span class="etiqueta">productos totales</span>
+    </div>
+    <div class="resumen-item">
+        <span class="numero">{{ disponibles }}</span>
+        <span class="etiqueta">disponibles</span>
+    </div>
+    <div class="resumen-item agotados">
+        <span class="numero">{{ agotados }}</span>
+        <span class="etiqueta">agotados</span>
+    </div>
+</div>
+
+<div class="grid">
+    {% for producto in productos %}
+    <div class="card {% if producto.stock == 0 %}sin-stock{% endif %}">
+        <a href="{% url 'catalogo:detalle' producto.id %}" class="card-link">
+            <img src="{% static producto.imagen %}" alt="{{ producto.nombre }}" class="card-img" loading="lazy">
+            <div class="nombre">{{ producto.nombre }}</div>
+            <div class="categoria">{{ producto.categoria }}</div>
+            <div class="precio">${{ producto.precio|floatformat:0 }}</div>
+        </a>
+        <div class="card-bottom">
+            <div class="stock">
+                {% if producto.stock > 0 %}
+                    <span class="badge badge-disponible">En stock ({{ producto.stock }})</span>
+                {% else %}
+                    <span class="badge badge-agotado">Agotado</span>
+                {% endif %}
+            </div>
+            {% if not es_admin and producto.stock > 0 and username %}
+            <form method="post" action="{% url 'catalogo:agregar_al_carrito' producto.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-carrito">Agregar al carrito</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

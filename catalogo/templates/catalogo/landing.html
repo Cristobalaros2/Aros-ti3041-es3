@@ -1,0 +1,153 @@
+{% extends "catalogo/base.html" %}
+{% load static %}
+
+{% block title %}Ferretería El Martillo — Tu aliado en construcción{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-badge">🔩 Desde 1990</span>
+        <h1>Ferretería El Martillo</h1>
+        <p class="hero-sub">Tu aliado de confianza en construcción y hogar</p>
+        <p class="hero-desc">Más de 40 productos de calidad en herramientas, pinturas, plomería y electricidad. Los mejores precios para tus proyectos.</p>
+        <div class="hero-botones">
+            <a href="{% url 'catalogo:lista' %}" class="hero-btn-primary">Ver catálogo</a>
+            <a href="{% url 'catalogo:registro' %}" class="hero-btn-secondary">Crear cuenta</a>
+        </div>
+    </div>
+    <div class="hero-galeria">
+        <img src="{% static 'images/01-martillo.jpg' %}" alt="Martillo" class="hero-img">
+        <img src="{% static 'images/10-taladro.jpg' %}" alt="Taladro" class="hero-img">
+        <img src="{% static 'images/26-pintura.jpg' %}" alt="Pintura" class="hero-img">
+        <img src="{% static 'images/33-tubo-pvc.jpg' %}" alt="Tubo PVC" class="hero-img">
+    </div>
+    <div class="hero-stats">
+        <div class="stat">
+            <span class="stat-num">40+</span>
+            <span class="stat-label">Productos</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">6</span>
+            <span class="stat-label">Categorías</span>
+        </div>
+        <div class="stat">
+            <span class="stat-num">24h</span>
+            <span class="stat-label">Despacho</span>
+        </div>
+    </div>
+</section>
+
+<section class="destacados">
+    <h2 class="section-title">Productos destacados</h2>
+    <p class="section-sub">Los más vendidos de nuestro catálogo</p>
+    <div class="dest-grid">
+        {% for p in destacados %}
+        <a href="{% url 'catalogo:detalle' p.id %}" class="dest-card">
+            <img src="{% static p.imagen %}" alt="{{ p.nombre }}" class="dest-img">
+            <div class="dest-info">
+                <h3>{{ p.nombre }}</h3>
+                <span class="dest-precio">${{ p.precio|floatformat:0 }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="categorias">
+    <h2 class="section-title">Nuestras categorías</h2>
+    <p class="section-sub">Todo lo que necesitas en un solo lugar</p>
+    <div class="cat-grid">
+        <a href="{% url 'catalogo:lista' %}" class="cat-card">
+            <div class="cat-img-wrap">
+                <img src="{% static 'images/05-sierra-manual.jpg' %}" alt="Herramientas" class="cat-img">
+            </div>
+            <div class="cat-texto">
+                <h3>Herramientas manuales</h3>
+                <p>Martillos, destornilladores, llaves y más</p>
+                <span class="cat-link">Ver productos →</span>
+            </div>
+        </a>
+        <a href="{% url 'catalogo:lista' %}" class="cat-card">
+            <div class="cat-img-wrap">
+                <img src="{% static 'images/11-amoladora.jpg' %}" alt="Herramientas eléctricas" class="cat-img">
+            </div>
+            <div class="cat-texto">
+                <h3>Herramientas eléctricas</h3>
+                <p>Taladros, amoladoras, sierras circulares</p>
+                <span class="cat-link">Ver productos →</span>
+            </div>
+        </a>
+        <a href="{% url 'catalogo:lista' %}" class="cat-card">
+            <div class="cat-img-wrap">
+                <img src="{% static 'images/20-tornillos.jpg' %}" alt="Fijaciones" class="cat-img">
+            </div>
+            <div class="cat-texto">
+                <h3>Fijaciones</h3>
+                <p>Tornillos, clavos, tarugos y anclajes</p>
+                <span class="cat-link">Ver productos →</span>
+            </div>
+        </a>
+        <a href="{% url 'catalogo:lista' %}" class="cat-card">
+            <div class="cat-img-wrap">
+                <img src="{% static 'images/26-pintura.jpg' %}" alt="Pinturas" class="cat-img">
+            </div>
+            <div class="cat-texto">
+                <h3>Pinturas y acabados</h3>
+                <p>Pinturas, brochas, rodillos y lijas</p>
+                <span class="cat-link">Ver productos →</span>
+            </div>
+        </a>
+        <a href="{% url 'catalogo:lista' %}" class="cat-card">
+            <div class="cat-img-wrap">
+                <img src="{% static 'images/33-tubo-pvc.jpg' %}" alt="Plomería" class="cat-img">
+            </div>
+            <div class="cat-texto">
+                <h3>Plomería</h3>
+                <p>Tubos PVC, conexiones, llaves de paso</p>
+                <span class="cat-link">Ver productos →</span>
+            </div>
+        </a>
+        <a href="{% url 'catalogo:lista' %}" class="cat-card">
+            <div class="cat-img-wrap">
+                <img src="{% static 'images/38-cable.jpg' %}" alt="Electricidad" class="cat-img">
+            </div>
+            <div class="cat-texto">
+                <h3>Electricidad</h3>
+                <p>Cables, interruptores, iluminación LED</p>
+                <span class="cat-link">Ver productos →</span>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="beneficios">
+    <div class="beneficio">
+        <div class="ben-icon">🚚</div>
+        <h3>Despacho rápido</h3>
+        <p>Entrega en 24 horas a todo el país</p>
+    </div>
+    <div class="beneficio">
+        <div class="ben-icon">💳</div>
+        <h3>Pago seguro</h3>
+        <p>Múltiples medios de pago disponibles</p>
+    </div>
+    <div class="beneficio">
+        <div class="ben-icon">🛡️</div>
+        <h3>Garantía</h3>
+        <p>Todos nuestros productos con garantía</p>
+    </div>
+    <div class="beneficio">
+        <div class="ben-icon">📞</div>
+        <h3>Atención 24/7</h3>
+        <p>Estamos para ayudarte cuando nos necesites</p>
+    </div>
+</section>
+
+<section class="cta-final">
+    <div class="cta-contenido">
+        <h2>¿Listo para empezar tu proyecto?</h2>
+        <p>Explora nuestro catálogo y encuentra todo lo que necesitas al mejor precio</p>
+        <a href="{% url 'catalogo:lista' %}" class="cta-btn-final">Ir al catálogo →</a>
+    </div>
+</section>
+{% endblock %}

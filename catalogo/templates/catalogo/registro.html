@@ -1,0 +1,45 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Registrarse — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Crear cuenta</h2>
+        <p class="auth-sub">Regístrate para acceder al catálogo</p>
+
+        {% if errores %}
+            <ul class="errorlist">
+                {% for error in errores %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Usuario</label>
+                <input type="text" name="username" id="id_username" placeholder="Elige un usuario" required autofocus value="{{ username|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="id_email">Correo electrónico</label>
+                <input type="email" name="email" id="id_email" placeholder="tu@correo.com" value="{{ email|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="id_password1">Contraseña</label>
+                <input type="password" name="password1" id="id_password1" placeholder="Mínimo 8 caracteres" required>
+            </div>
+            <div class="form-group">
+                <label for="id_password2">Confirmar contraseña</label>
+                <input type="password" name="password2" id="id_password2" placeholder="Repite tu contraseña" required>
+            </div>
+            <button type="submit" class="btn-submit">Crear cuenta</button>
+        </form>
+
+        <div class="auth-footer">
+            ¿Ya tienes cuenta? <a href="{% url 'catalogo:login' %}">Inicia sesión</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
