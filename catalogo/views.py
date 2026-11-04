@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Avg, Count, Sum
 from django.views.decorators.http import require_POST
 
 from .forms import ProductoForm
@@ -127,6 +128,57 @@ def eliminar_producto(request, producto_id):
     return render(request, "catalogo/confirmar_eliminar.html", {
         **_contexto_base(request),
         "producto": producto,
+    })
+
+
+# === REPORTES CON ORM ===
+
+UMBRAL_STOCK_CRITICO = 5
+
+
+def reporte_resumen(request):
+    """Reporte 1: cantidad de productos y cálculos por categoría (aggregate/annotate)."""
+    por_categoria = (
+        Producto.objects
+        .values("categoria")
+        .annotate(
+            cantidad=Count("id"),
+            precio_promedio=Avg("precio"),
+            stock_total=Sum("stock"),
+        )
+        .order_by("-cantidad", "categoria")
+    )
+
+    totales = Producto.objects.aggregate(
+        cantidad=Count("id"),
+        precio_promedio=Avg("precio"),
+        stock_total=Sum("stock"),
+    )
+
+    return render(request, "catalogo/reporte_resumen.html", {
+        **_contexto_base(request),
+        "por_categoria": por_categoria,
+        "totales": totales,
+        "categorias": len(por_categoria),
+    })
+
+
+def reporte_stock(request):
+    """Reporte 2: productos con stock bajo el umbral, filtrados y ordenados con el ORM."""
+    criticos = (
+        Producto.objects
+        .filter(stock__lte=UMBRAL_STOCK_CRITICO)
+        .order_by("stock", "nombre")
+    )
+
+    resumen = criticos.aggregate(cantidad=Count("id"), stock_total=Sum("stock"))
+
+    return render(request, "catalogo/reporte_stock.html", {
+        **_contexto_base(request),
+        "criticos": criticos,
+        "resumen": resumen,
+        "umbral": UMBRAL_STOCK_CRITICO,
+        "agotados": criticos.filter(stock=0).count(),
     })
 
 

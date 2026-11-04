@@ -1,0 +1,62 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Reporte resumen por categoría — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<h2 class="section-title">Reporte 1: Resumen por categoría</h2>
+<p class="section-sub">Cantidad de productos, precio promedio y stock total calculados con el ORM</p>
+
+<div class="reporte-total">
+    <div class="resumen-item">
+        <span class="numero">{{ totales.cantidad }}</span>
+        <span class="etiqueta">productos en total</span>
+    </div>
+    <div class="resumen-item">
+        <span class="numero">{{ categorias }}</span>
+        <span class="etiqueta">categorías</span>
+    </div>
+    <div class="resumen-item">
+        <span class="numero">${{ totales.precio_promedio|floatformat:0 }}</span>
+        <span class="etiqueta">precio promedio general</span>
+    </div>
+    <div class="resumen-item">
+        <span class="numero">{{ totales.stock_total }}</span>
+        <span class="etiqueta">unidades en stock</span>
+    </div>
+</div>
+
+<div class="reporte-tabla-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Categoría</th>
+                <th>Productos</th>
+                <th>Precio promedio</th>
+                <th>Stock total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fila in por_categoria %}
+            <tr>
+                <td><strong>{{ fila.categoria }}</strong></td>
+                <td>{{ fila.cantidad }}</td>
+                <td>${{ fila.precio_promedio|floatformat:0 }}</td>
+                <td>{{ fila.stock_total }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay productos en el catálogo.</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>{{ totales.cantidad }}</strong></td>
+                <td><strong>${{ totales.precio_promedio|floatformat:0 }}</strong></td>
+                <td><strong>{{ totales.stock_total }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'catalogo:reporte_stock' %}" class="volver">Ver reporte de stock crítico →</a>
+{% endblock %}

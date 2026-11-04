@@ -1,0 +1,65 @@
+{% extends "catalogo/base.html" %}
+{% load static %}
+
+{% block title %}Reporte de stock crítico — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<h2 class="section-title">Reporte 2: Stock crítico</h2>
+<p class="section-sub">Productos con stock igual o inferior a {{ umbral }} unidades, filtrados y ordenados con el ORM</p>
+
+<div class="reporte-total">
+    <div class="resumen-item agotados">
+        <span class="numero">{{ resumen.cantidad }}</span>
+        <span class="etiqueta">productos bajo el umbral</span>
+    </div>
+    <div class="resumen-item agotados">
+        <span class="numero">{{ agotados }}</span>
+        <span class="etiqueta">agotados (stock 0)</span>
+    </div>
+    <div class="resumen-item">
+        <span class="numero">{{ resumen.stock_total }}</span>
+        <span class="etiqueta">unidades restantes</span>
+    </div>
+</div>
+
+<div class="reporte-tabla-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in criticos %}
+            <tr {% if producto.stock == 0 %}class="reporte-fila-destacada"{% endif %}>
+                <td>
+                    <a href="{% url 'catalogo:detalle' producto.id %}" style="color:#2e86c1; font-weight:600; text-decoration:none">
+                        {{ producto.nombre }}
+                    </a>
+                </td>
+                <td>{{ producto.categoria }}</td>
+                <td>${{ producto.precio|floatformat:0 }}</td>
+                <td><strong>{{ producto.stock }}</strong></td>
+                <td>
+                    {% if producto.stock == 0 %}
+                        <span class="badge badge-agotado">Agotado</span>
+                    {% else %}
+                        <span class="badge badge-disponible">Stock bajo</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Ningún producto está bajo el umbral de {{ umbral }} unidades.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'catalogo:reporte_resumen' %}" class="volver">← Volver al reporte de resumen</a>
+{% endblock %}
