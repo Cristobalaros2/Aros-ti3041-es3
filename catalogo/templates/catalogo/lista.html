@@ -4,6 +4,13 @@
 {% block title %}Catálogo — Ferretería El Martillo{% endblock %}
 
 {% block content %}
+{% if es_admin %}
+<div class="admin-header">
+    <h2>Gestión del catálogo</h2>
+    <a href="{% url 'catalogo:crear' %}" class="btn-agregar">+ Nuevo producto</a>
+</div>
+{% endif %}
+
 <div class="resumen">
     <div class="resumen-item">
         <span class="numero">{{ total }}</span>
@@ -41,6 +48,12 @@
                 {% csrf_token %}
                 <button type="submit" class="btn-carrito">Agregar al carrito</button>
             </form>
+            {% endif %}
+            {% if es_admin %}
+            <div class="admin-acciones">
+                <a href="{% url 'catalogo:editar' producto.id %}" class="btn-editar">Editar</a>
+                <a href="{% url 'catalogo:eliminar' producto.id %}" class="btn-eliminar">Eliminar</a>
+            </div>
             {% endif %}
         </div>
     </div>

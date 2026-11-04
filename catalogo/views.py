@@ -1,11 +1,30 @@
-﻿from django.shortcuts import render, redirect, get_object_or_404
+﻿from functools import wraps
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.views.decorators.http import require_POST
 
+from .forms import ProductoForm
 from .models import Producto, ItemCarrito
+
+
+def staff_required(view):
+    """Solo administradores del sitio pueden gestionar el catálogo desde la web."""
+
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "Inicia sesión con una cuenta de administrador para gestionar el catálogo.")
+            return redirect("catalogo:login")
+        if not request.user.is_staff:
+            messages.error(request, "No tienes permisos para gestionar el catálogo.")
+            return redirect("catalogo:lista")
+        return view(request, *args, **kwargs)
+
+    return wrapper
 
 
 def _contexto_base(request):
@@ -45,6 +64,67 @@ def lista_productos(request):
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     return render(request, "catalogo/detalle.html", {
+        **_contexto_base(request),
+        "producto": producto,
+    })
+
+
+# === CRUD DEL CATÁLOGO (SOLO ADMIN) ===
+
+@staff_required
+def crear_producto(request):
+    if request.method == "POST":
+        form = ProductoForm(request.POST)
+        if form.is_valid():
+            producto = form.save()
+            messages.success(request, f"Producto '{producto.nombre}' creado correctamente.")
+            return redirect("catalogo:lista")
+        messages.error(request, "No se pudo crear el producto. Revisa los campos marcados.")
+    else:
+        form = ProductoForm()
+
+    return render(request, "catalogo/producto_form.html", {
+        **_contexto_base(request),
+        "form": form,
+        "titulo": "Nuevo producto",
+        "boton": "Crear producto",
+    })
+
+
+@staff_required
+def editar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+
+    if request.method == "POST":
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Producto '{producto.nombre}' actualizado correctamente.")
+            return redirect("catalogo:lista")
+        messages.error(request, "No se pudo actualizar el producto. Revisa los campos marcados.")
+    else:
+        form = ProductoForm(instance=producto)
+
+    return render(request, "catalogo/producto_form.html", {
+        **_contexto_base(request),
+        "form": form,
+        "titulo": f"Editar: {producto.nombre}",
+        "boton": "Guardar cambios",
+        "producto": producto,
+    })
+
+
+@staff_required
+def eliminar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+
+    if request.method == "POST":
+        nombre = producto.nombre
+        producto.delete()
+        messages.success(request, f"Producto '{nombre}' eliminado del catálogo.")
+        return redirect("catalogo:lista")
+
+    return render(request, "catalogo/confirmar_eliminar.html", {
         **_contexto_base(request),
         "producto": producto,
     })

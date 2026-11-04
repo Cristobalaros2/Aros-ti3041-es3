@@ -1,0 +1,34 @@
+{% extends "catalogo/base.html" %}
+{% load static %}
+
+{% block title %}Eliminar {{ producto.nombre }} — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card confirmar-eliminar">
+        <h2>Eliminar producto</h2>
+        <p class="auth-sub">Esta acción no se puede deshacer</p>
+
+        <div class="confirmar-datos">
+            {% if producto.imagen %}
+                <img src="{% static producto.imagen %}" alt="{{ producto.nombre }}" class="confirmar-img">
+            {% endif %}
+            <p><strong>{{ producto.nombre }}</strong></p>
+            <p class="confirmar-meta">{{ producto.categoria }} · ${{ producto.precio|floatformat:0 }} · stock {{ producto.stock }}</p>
+        </div>
+
+        <p class="confirmar-texto">
+            ¿Seguro que quieres eliminar <strong>«{{ producto.nombre }}»</strong> del catálogo?
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-submit btn-peligro">Sí, eliminar</button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{% url 'catalogo:lista' %}">Cancelar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
