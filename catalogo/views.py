@@ -44,9 +44,18 @@ def _contexto_base(request):
 
 def landing_page(request):
     destacados = Producto.objects.order_by("-precio")[:4]
+    muestra = list(Producto.objects.order_by("?")[:10])
+    totales = Producto.objects.aggregate(total=Count("id"), stock=Sum("stock"))
+    stats = {
+        "total": totales["total"] or 0,
+        "categorias": Producto.objects.values("categoria").distinct().count(),
+        "stock": totales["stock"] or 0,
+    }
     return render(request, "catalogo/landing.html", {
         **_contexto_base(request),
         "destacados": destacados,
+        "muestra": muestra,
+        "stats": stats,
     })
 
 
