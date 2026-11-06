@@ -1,0 +1,40 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Consulta enviada — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<div class="compra-exitosa">
+    <div class="compra-icono">✅</div>
+    <h2>¡Consulta registrada!</h2>
+    <p class="compra-sub">Gracias, {{ consulta.nombre }}. Te responderemos a la brevedad.</p>
+
+    <div class="compra-detalle" style="border-top-color:#2e86c1">
+        <h3>Resumen de tu consulta</h3>
+        <div class="campo">
+            <span class="etiqueta">Nombre</span>
+            <span class="valor">{{ consulta.nombre }}</span>
+        </div>
+        <div class="campo">
+            <span class="etiqueta">Correo</span>
+            <span class="valor">{{ consulta.correo }}</span>
+        </div>
+        <div class="campo">
+            <span class="etiqueta">Producto de interés</span>
+            <span class="valor">{{ consulta.producto|default:"Sin producto específico" }}</span>
+        </div>
+        <div class="campo">
+            <span class="etiqueta">Fecha</span>
+            <span class="valor">{{ consulta.fecha|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="campo" style="flex-direction:column; align-items:flex-start; gap:0.3rem">
+            <span class="etiqueta">Mensaje</span>
+            <span class="valor">{{ consulta.mensaje }}</span>
+        </div>
+    </div>
+
+    <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
+        <a href="{% url 'catalogo:consulta' %}" class="hero-btn-secondary" style="color:#1a5276; border-color:#2e86c1">Enviar otra consulta</a>
+        <a href="{% url 'catalogo:lista' %}" class="hero-btn-primary">Volver al catálogo</a>
+    </div>
+</div>
+{% endblock %}

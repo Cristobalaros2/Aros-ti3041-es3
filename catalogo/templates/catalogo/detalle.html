@@ -35,6 +35,28 @@
         <a href="{% url 'catalogo:login' %}" style="color:#2e86c1">Inicia sesión</a> para agregar al carrito.
     </p>
     {% endif %}
+
+    <p style="margin-top:1.2rem; font-size:0.9rem;">
+        <a href="{% url 'catalogo:consulta' %}?producto={{ producto.id }}" style="color:#2e86c1; font-weight:600">
+            Consultar sobre este producto →
+        </a>
+    </p>
 </div>
+
+{% if historial %}
+<div class="historial">
+    <h3>Recién vistos (sesión)</h3>
+    <div class="historial-lista">
+        {% for item in historial %}
+        <a href="{% url 'catalogo:detalle' item.id %}" class="historial-item">
+            <img src="{% static item.imagen %}" alt="{{ item.nombre }}">
+            <span>{{ item.nombre }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    <p class="historial-nota">Últimos {{ total_visitados }} productos visitados en esta sesión (máximo 3).</p>
+</div>
+{% endif %}
+
 <a href="{% url 'catalogo:lista' %}" class="volver">← Volver al catálogo</a>
 {% endblock %}

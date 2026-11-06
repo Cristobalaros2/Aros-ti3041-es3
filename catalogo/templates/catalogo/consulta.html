@@ -1,0 +1,47 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Formulario de consultas — Ferretería El Martillo{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Formulario de consultas</h2>
+        <p class="auth-sub">Cuéntanos qué necesitas y te contactaremos</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="form-hint">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-submit">Enviar consulta</button>
+        </form>
+
+        <div class="auth-footer">
+            <a href="{% url 'catalogo:lista' %}">← Volver al catálogo</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

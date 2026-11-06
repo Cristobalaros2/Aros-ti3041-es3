@@ -1203,3 +1203,53 @@ footer {
 .reporte-fila-destacada {
     background: #fdf2f2 !important;
 }
+
+
+/* === SESIÓN: PRODUCTOS RECÍEN VISTOS === */
+.historial {
+    background: white;
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    max-width: 600px;
+    margin: 1.5rem auto 0;
+    border-top: 5px solid #27ae60;
+}
+.historial h3 {
+    color: #1a5276;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+}
+.historial-lista {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+.historial-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f7f9fb;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    text-decoration: none;
+    color: #1a5276;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: border-color 0.2s;
+}
+.historial-item:hover {
+    border-color: #2e86c1;
+}
+.historial-item img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+.historial-nota {
+    margin-top: 0.7rem;
+    font-size: 0.75rem;
+    color: #888;
+}

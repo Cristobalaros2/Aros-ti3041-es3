@@ -8,8 +8,10 @@ from django.db import transaction
 from django.db.models import Avg, Count, Sum
 from django.views.decorators.http import require_POST
 
-from .forms import ProductoForm
-from .models import Producto, ItemCarrito
+from .forms import ProductoForm, ConsultaClienteForm
+from .models import Producto, ItemCarrito, ConsultaCliente
+
+ULTIMOS_VISITADOS = 3
 
 
 def staff_required(view):
@@ -64,9 +66,23 @@ def lista_productos(request):
 
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
+
+    # Sesión: guarda los últimos productos visitados (máximo 3, sin repetir)
+    visitados = [pid for pid in request.session.get("visitados", []) if pid != producto_id]
+    visitados.insert(0, producto_id)
+    request.session["visitados"] = visitados[:ULTIMOS_VISITADOS]
+
+    historial = []
+    for pid in request.session["visitados"][1:]:
+        p = Producto.objects.filter(id=pid).first()
+        if p:
+            historial.append(p)
+
     return render(request, "catalogo/detalle.html", {
         **_contexto_base(request),
         "producto": producto,
+        "historial": historial,
+        "total_visitados": len(request.session["visitados"]),
     })
 
 
@@ -179,6 +195,32 @@ def reporte_stock(request):
         "resumen": resumen,
         "umbral": UMBRAL_STOCK_CRITICO,
         "agotados": criticos.filter(stock=0).count(),
+    })
+
+
+# === FORMULARIO DE CONSULTAS DE CLIENTES ===
+
+def formulario_consulta(request):
+    if request.method == "POST":
+        form = ConsultaClienteForm(request.POST)
+        if form.is_valid():
+            consulta = form.save()
+            messages.success(request, "Tu consulta fue registrada correctamente.")
+            return render(request, "catalogo/consulta_exitosa.html", {
+                **_contexto_base(request),
+                "consulta": consulta,
+            })
+        messages.error(request, "No se pudo enviar la consulta. Revisa los campos marcados.")
+    else:
+        initial = {}
+        producto_id = request.GET.get("producto", "")
+        if producto_id.isdigit() and Producto.objects.filter(id=producto_id).exists():
+            initial["producto"] = producto_id
+        form = ConsultaClienteForm(initial=initial)
+
+    return render(request, "catalogo/consulta.html", {
+        **_contexto_base(request),
+        "form": form,
     })
 
 

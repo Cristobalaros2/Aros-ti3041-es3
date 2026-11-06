@@ -20,4 +20,5 @@ urlpatterns = [
     path("carrito/comprar/", views.realizar_compra, name="realizar_compra"),
     path("reportes/resumen/", views.reporte_resumen, name="reporte_resumen"),
     path("reportes/stock/", views.reporte_stock, name="reporte_stock"),
+    path("consulta/", views.formulario_consulta, name="consulta"),
 ]
