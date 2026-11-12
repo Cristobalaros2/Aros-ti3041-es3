@@ -37,7 +37,7 @@
             {% for producto in criticos %}
             <tr {% if producto.stock == 0 %}class="reporte-fila-destacada"{% endif %}>
                 <td>
-                    <a href="{% url 'catalogo:detalle' producto.id %}" style="color:#2e86c1; font-weight:600; text-decoration:none">
+                    <a href="{% url 'catalogo:detalle' producto.id %}">
                         {{ producto.nombre }}
                     </a>
                 </td>

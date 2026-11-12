@@ -1,54 +1,105 @@
-# Documento de uso de IA — ES2 Ferretería El Martillo
+# Documento de uso de IA — ES3 Ferretería El Martillo
 
 ## Parte 1: Registro de consultas
 
-### Consulta 1 — Guía paso a paso de la migración
-**Prompt:** "Necesito que este mismo código lo modifiques a las pautas de evaluación de la ES2. Explícame qué hiciste, cómo lo hiciste, en una guía paso a paso para hacer manualmente el cambio en los códigos."
+### Consulta 1 — Entorno del proyecto (Etapa 0)
+**Prompt:** "Prepara la Evaluación Sumativa 3: crea el proyecto Django con la app catalogo usando pipenv y dejando también requirements.txt, un .gitignore que excluya db.sqlite3 y __pycache__, y el README con la tabla de las 5 etapas y sus entregables. Todo en el repo nuevo, con el primer commit etapa-0-entorno."
 
-**Resumen de respuesta:** La IA me entregó una guía dividida en 5 fases (una por etapa): qué archivos crear, qué borrar de la ES1, cómo quedarían los modelos, cómo se registra el admin y cómo se carga la fixture. Cada paso indicaba el archivo exacto y el comando a ejecutar.
+**Resumen de respuesta:** Proyecto Django con settings en `config`, app `catalogo`, Pipfile y requirements.txt actualizados, .gitignore con la basura de Python y SQLite, y README con la tabla de etapas.
 
-**Qué usó o modificó antes de integrarla:** Usé la guía como plan de trabajo para ejecutar las 5 etapas. Le pedí ajustes antes de empezar: conservar login/registro/carrito de la ES1 (la ES3 los necesita), usar pipenv además de generar `requirements.txt`, y que los templates no cambiaran calculando `username` y `es_admin` desde `request.user` en una función auxiliar. También me indicó que borrara el admin propio de la ES1 (4 vistas, 4 URLs, 3 templates) porque Django Admin lo reemplazaba.
+**Qué usó o modificó antes de integrarla:** Instalé con pipenv y verifiqué que `runserver` arrancara sin errores. Como db.sqlite3 no se versiona, dejé la fixture `catalogo/fixtures/productos.json` para poder regenerar los 40 productos con `loaddata` en cualquier clon. Revisé con `git status` que no se colara nada (venv, .pyc, la BD) antes de cerrar el commit.
 
-### Consulta 2 — Modelo de datos y migraciones
-**Prompt:** "Crea el modelo Producto de la variante ferretería con nombre, categoría, precio e stock (y el campo imagen para las fotos de la ES1), con __str__. También un modelo ItemCarrito con usuario ( ForeignKey a User), producto ( ForeignKey a Producto) y cantidad, con unique_together."
+### Consulta 2 — CRUD web con confirmación (Etapa 1)
+**Prompt:** "Etapa 1: CRUD de productos desde el sitio. Crea un ModelForm para Producto y las vistas de crear, editar y eliminar con plantilla, protegidas con un decorador staff_required que si el usuario no es staff lo redirija con un mensaje de error; antes de eliminar muestra una página de confirmación. Usa django.contrib.messages para los avisos de éxito y error, y enlaza todo desde el listado del catálogo. Commit etapa-1-crud."
 
-**Resumen de respuesta:** Me generó los dos modelos con los tipos adecuados: `CharField` para nombre/categoría/imagen, `IntegerField` para precio/stock, `PositiveIntegerField` para cantidad, más las foreign keys y el `__str__` pedido en ambos.
+**Resumen de respuesta:** Las tres vistas (`crear_producto`, `editar_producto`, `eliminar_producto`) con el decorador `staff_required`, el formulario compartido `producto_form.html`, la página `confirmar_eliminar.html` que solo borra en POST, y los mensajes success/error en cada acción.
 
-**Qué usó o modificó antes de integrarla:** Agregué `Meta.ordering = ["id"]` al Producto para mantener el orden del catálogo de la ES1 y `related_name` a las foreign keys. Luego ejecuté `python manage.py makemigrations catalogo` y `python manage.py migrate`, verificando que las migraciones se aplicaran sin errores. Como el superusuario tenía que existir en cualquier clon nuevo, le pedí además una migración de datos (`0002_crear_superusuario`) que crea `admin/admin123` en cada `migrate`.
+**Qué usó o modificó antes de integrarla:** Probé tres escenarios: sin sesión me devuelve el mensaje "Inicia sesión con una cuenta de administrador…", con usuario normal "No tienes permisos…", y como admin puedo crear, editar y eliminar (siempre pasando por la confirmación). Verifiqué el token CSRF en los formularios y que los mensajes se mostraran en base.html.
 
-### Consulta 3 — Django Admin con list_display y búsqueda
-**Prompt:** "Registra Producto e ItemCarrito en admin.py con list_display de 3 campos o más, search_fields y list_filter, para cumplir el criterio 2.1.2 de la pauta."
+### Consulta 3 — Reportes con ORM (Etapa 2)
+**Prompt:** "Etapa 2: dos reportes que usen el ORM y no cálculos a mano: resumen general con values y annotate por categoría (cantidad de productos, precio promedio, stock total) más aggregate con los totales generales, y stock crítico con filter de los productos con stock menor o igual a 5 ordenados de menor a mayor. Cada reporte en su página: /reportes/resumen/ y /reportes/stock/. Commit etapa-2-reportes."
 
-**Resumen de respuesta:** Me entregó las clases `ProductoAdmin` y `ItemCarritoAdmin` decoradas con `@admin.register`, con `list_display = ("nombre", "categoria", "precio", "stock")`, `search_fields = ("nombre", "categoria")` y `list_filter = ("categoria",)`.
+**Resumen de respuesta:** Las vistas `reporte_resumen` y `reporte_stock` con `Count`, `Avg`, `Sum`, `values().annotate()` y `filter(stock__lte=UMBRAL_STOCK_CRITICO)`, más las dos tablas en sus templates.
 
-**Qué usó o modificó antes de integrarla:** Probé todo desde `/admin`: la búsqueda con `?q=martillo`, el filtro por categoría y el CRUD completo (crear, editar y eliminar un producto de prueba), verificando cada vez que el cambio se reflejara en el catálogo del sitio.
+**Qué usó o modificó antes de integrarla:** Contrasté cada número contra la base: 40 productos, 6 categorías, 1.718 unidades en stock y 11 productos bajo el umbral de los cuales 7 están agotados. Revisé que los cálculos salieran todos del ORM y no de listas en Python.
 
-### Consulta 4 — Autenticación con django.contrib.auth
-**Prompt:** "Reemplaza mi autenticación en JSON (usuarios.json con SHA-256) por django.contrib.auth: login con authenticate() y login(), registro con User.objects.create_user() y logout con logout(). Mis validaciones de registro se mantienen, el rol admin pasa a ser user.is_staff, y los templates no deben cambiar."
+### Consulta 4 — Formulario de consulta con validaciones (Etapa 3)
+**Prompts:**
+- "Crea el modelo ConsultaCliente con nombre, correo, mensaje, producto de interés (ForeignKey opcional a Producto) y fecha automática, más el ModelForm con estas validaciones: nombre obligatorio de mínimo 3 caracteres, solo letras, espacios y puntos (sin números); correo obligatorio que termine en @gmail.com; mensaje entre 10 y 500 caracteres. Con labels y help_texts en español, y el template con {% csrf_token %}."
+- "Agrega la vista /consulta/ que al enviar por POST guarde la consulta en la BD y muestre una página de éxito; y que cada vez que alguien abre un producto lo registre en la sesión (clave 'visitados', máximo 3 y sin repetir) para mostrarle el historial en la página de detalle."
 
-**Resumen de respuesta:** Me reescribió las tres vistas (`vista_login`, `vista_registro`, `vista_logout`) usando la API de autenticación de Django. Para no tocar los templates, creó una función `_contexto_base(request)` que calcula `username`, `es_admin` y `cart_count` desde `request.user`, y las vistas usan `**_contexto_base(request)` en el contexto.
+**Resumen de respuesta:** El modelo `ConsultaCliente`, el `ConsultaClienteForm` con `clean_nombre`, `clean_correo` y `clean_mensaje`, la vista `formulario_consulta` con `consulta.html` y `consulta_exitosa.html`, y la sesión con `ULTIMOS_VISITADOS = 3` que se actualiza en `detalle_producto` y entrega el `historial`.
 
-**Qué usó o modificó antes de integrarla:** Cambié las validaciones: `_usuario_existe()` pasó a `User.objects.filter(username=...).exists()`. Verifiqué que las contraseñas ahora se guardan con PBKDF2 de Django (ya no SHA-256) y probé el flujo completo: registro crea el usuario en la BD, login autentica, logout cierra la sesión, y el badge "Admin" del nav sale de `user.is_staff`.
+**Qué usó o modificó antes de integrarla:** Le armé un script de pruebas con 19 casos hasta que pasaran todos: nombre con números rechazado, nombre de menos de 3 caracteres, nombre solo con puntos, correo sin @gmail.com, correo con espacios al medio, mensaje de 9 y de 501 caracteres, y los casos válidos con tildes y ñ. Ajusté los mensajes de error para que explicaran cada regla, verifiqué que el token CSRF estuviera en el template y que el historial mostrara exactamente 3 productos sin importar cuántas veces repitiera uno. Commit etapa-3-clientes.
 
-### Consulta 5 — Poblamiento con IA y lectura desde la BD ⭐
-**Prompt (poblamiento):**
-> "Genera una fixture JSON de Django para el modelo catalogo.Producto con 40 productos de ferretería chilenos realistas. Campos: nombre, categoría, precio (int, 1000 a 150000), stock (int, 0 a 50). Formato: lista de objetos con model, pk y fields, lista para cargar con loaddata."
+### Consulta 5 — Primer landing animado (OpenCode)
+**Prompts:**
+- "Hazme el landing page de la ferretería con animaciones: preloader al entrar, hero con título animado, secciones de categorías y productos destacados, contadores que muestren datos reales del ORM y barra de progreso al hacer scroll."
+- "podrias dejar ese sello de calidad mas cerca del boton de crear cuenta, para que asi no este por encima de la imagen, como tambien la etiqueta pequeña del precios bajos"
+- "haz que cada uno este un poco mas abajo y mas separado el uno del otro, que no queden tan juntos que si no el sello no se ve completo"
 
-**Prompt (posterior):** "Ya con la fixture cargada, elimina PRODUCTOS_DEFAULT, la función _asegurar_productos y cualquier referencia a JSON en views.py, para que el template principal lea desde la BD con ORM sin datos en duro. También conecta los productos destacados del landing a la BD."
+**Resumen de respuesta:** Un landing con preloader, hero a dos columnas con collage 3D que sigue el cursor, contadores armados con los `aggregate` de la vista (40 productos, 6 categorías, 1.718 unidades), carrusel infinito de productos, banda con marquee, categorías en cuadrícula bento y un sello circular giratorio con texto en SVG.
 
-**Resumen de respuesta:** Del primer prompt: la lista completa de 40 productos con precios chilenos realistas en formato fixture. Del segundo: las líneas exactas a eliminar y el loop `{% for p in destacados %}` con `Producto.objects.order_by("-precio")[:4]`.
+**Qué usó o modificó antes de integrarla:** Moví el sello y el chip "Precios bajos" a un contenedor junto al botón "Crear cuenta" y luego los bajé y separé en una segunda ronda hasta que el sello se viera completo sin tapar las imágenes. Verifiqué que los contadores usaran los datos del ORM y no números fijos, que todo respondiera en móvil y que hubiera respaldo para `prefers-reduced-motion`. Lo integré en el commit entrega-final; más adelante lo reemplacé por completo con el diseño de la consulta 6.
 
-**Ajustes que hice antes de integrarla:**
-1. **Formato:** ajusté la salida al formato exacto de fixture de Django — `{"model": "catalogo.producto", "pk": 1, "fields": {...}}` con el nombre del modelo en minúsculas y `pk` explícito, tal como lo exige `loaddata`.
-2. **Volumen:** mi base de la ES1 tenía 41 productos (uno se había agregado desde el admin); la pauta pide 40, así que eliminé el sobrante.
-3. **Stock:** mantuve exactamente 7 productos agotados (stock 0: IDs 4, 8, 13, 19, 27, 35, 40) para conservar el comportamiento de la ES1.
-4. **Carga:** guardé el archivo en `catalogo/fixtures/productos.json` y lo cargué con `python manage.py loaddata productos.json`, verificando los 40 productos y los 7 agotados en `/admin`.
-5. **Datos en duro:** eliminé 48 líneas de `views.py` y reemplacé los 4 productos hardcodeados del landing por el loop dinámico; verifiqué con grep que no quedara ninguna referencia a JSON.
+### Consulta 6 — Rediseño del landing (OpenCode)
+**Prompt:** "quiero que en base a este diseño https://godly.design/website/lightspark/ cambies el landing page al diseño que te mande, con las imagenes que ya tienes acerca de herramientas, materiales de construccion y todo eso"
+
+**Resumen de respuesta:** La IA descargó las capturas del sitio de referencia para analizar el diseño (fondo claro, grilla de imágenes redondeadas alrededor del título, líneas finas con marcas "+", botones tipo píldora, CTA y footer oscuros). Agregó bloques nuevos en `base.html` (`body_class`, `main_class`, `footer_content`) para poder cambiar solo el landing, actualizó la vista `landing_page` para enviar las categorías y la cantidad de productos con stock crítico, y reescribió `landing.html` con las secciones nuevas usando las imágenes de `static/images` y los datos del ORM.
+
+**Qué usó o modificó antes de integrarla:** La sesión quedó incompleta: nunca se creó el archivo de estilos `landing.css` y la grilla del hero tenía un error de posiciones que hacía que una imagen quedara encima del título. Por eso no la integré tal cual y la continué en la consulta 7.
+
+### Consulta 7 — Terminar el landing (Claude Code)
+**Prompt:** "hola, te voy a pasar las cosas que me habia cambiado una ia de opencode en cuanto al landing page de mi pagina, necesito que lo termines" (y le pegué la conversación completa con OpenCode).
+
+**Resumen de respuesta:** Creó `landing.css` con el estilo de la referencia, movió las posiciones de las imágenes del hero al CSS y levantó el servidor para revisar la página en el navegador, en escritorio y en celular. Al revisarla detectó que la franja de categorías salía repetida (unas 40 en vez de 6): el `ordering` del `Meta` de `Producto` hacía que `distinct()` no agrupara solo por categoría. Lo corrigió en la vista ordenando explícitamente por `categoria` antes del `distinct()`.
+
+**Qué usó o modificó antes de integrarla:** Revisé el resultado en el navegador y pedí cambios en las consultas siguientes.
+
+### Consulta 8 — Ajustes visuales del hero, header y footer
+**Prompts:**
+- "estas imagenes no las difumines tanto, lo otro es que acomodes las letras y los botones para que no queden por encima de las imagenes y de la segunda imagen borra ese texto en grande del 'el martillo'"
+- "ahora quita el emoji de martillo y coloca solo 'El martillo' y al medio de la pagina junto con el slogan"
+- "puedes hacer que las letras queden como mas en negro, como esta la de la segunda imagen"
+
+**Resumen de respuesta:** Bajó el difuminado de las imágenes (de `blur(12px)` a `blur(3px)`). Para que el texto no se montara sobre las imágenes, hizo que el hero completo fuera una grilla CSS donde el texto ocupa su propia celda central y la fila del medio crece según su alto. Eliminó la palabra gigante "el martillo" del footer, dejó el header como "El Martillo" centrado con el slogan y cambió los links del menú a color negro con más grosor.
+
+**Qué usó o modificó antes de integrarla:** Mandé capturas de pantalla de lo que no me gustaba y revisé cada cambio en distintos tamaños de pantalla antes de pedir el siguiente.
+
+### Consulta 9 — Aplicar el diseño al resto del sitio
+**Prompt:** "ya mira, sucede de que el resto de la pagina y las ventanas estan asi como en la primera imagen, no se si puedes retocar con los mismos colores y mejorar un poco cada pestaña"
+
+**Resumen de respuesta:** Separó en un archivo nuevo, `tema.css`, los estilos del header, el nav y el footer junto con los de las páginas internas: catálogo, detalle, reportes, formularios, carrito y compra. Lo cargó en `base.html` para todas las páginas y dejó `landing.css` solo con las secciones del inicio. Movió el footer oscuro de 4 columnas a `base.html` y quitó un color azul que estaba escrito directo en `reporte_stock.html`. No modificó `style.css`: el tema nuevo se carga después y lo sobrescribe.
+
+**Qué usó o modificó antes de integrarla:** Revisé que las páginas públicas cargaran y se vieran bien. Las páginas que requieren sesión (carrito, compra exitosa y crear o editar productos) las tengo que revisar iniciando sesión.
+
+### Consulta 10 — Limpieza de comentarios
+**Prompt:** "puedes borrar todos los comentarios de los archivos en visual studio que colocaste"
+
+**Resumen de respuesta:** Eliminó los comentarios agregados durante el rediseño en `tema.css`, `landing.css`, `landing.html` y `views.py`, sin tocar los comentarios que ya existían en el proyecto, y verificó que todas las páginas siguieran cargando.
+
+**Qué usó o modificó antes de integrarla:** Lo integré tal cual.
+
+### Consulta 11 — Actualizar este registro
+**Prompt:** "puedes modificar el anexo de ia acorde a lo que hicimos ahora, modificalo entero si quieres"
+
+**Resumen de respuesta:** Agregó a la Parte 1 las consultas 6 a 11 del rediseño. No escribió la Parte 2, porque la pauta exige que la redacte yo.
+
+**Qué usó o modificó antes de integrarla:** Revisé que cada consulta correspondiera a lo que pedí. La Parte 2 la actualicé con mis propias palabras.
+
+### Consulta 12 — Dejar este anexo solo de la ES3 (OpenCode)
+**Prompt:** "puedes hacer el anexo de ia que sea solamente de esta evaluacion y con prompts coherentes acorde a lo que te pedi del formulario?"
+
+**Resumen de respuesta:** Reestructuró el documento completo: sacó las consultas de la ES2, agregó las de las etapas 0 a 3 (incluida la del formulario con sus validaciones y las del primer landing animado), dejó el registro cubriendo solo esta evaluación y reescribió la Parte 2 como borrador enfocado en la ES3.
+
+**Qué usó o modificó antes de integrarla:** Revisé que los prompts correspondieran a lo que realmente le pedí en cada etapa y ajusté la Parte 2 con mis palabras antes de entregarla.
 
 ---
 
 ## Parte 2: Explicación del proceso
 
-Lo que más me gustó fue trabajar con el ORM. Antes de esto yo hacía todo leyendo archivos y metiendo datos a mano, así que entender que con `Producto.objects.all()` ya tenías todo el catálogo fue un alivio. Lo que más me complicó fue el carrito: la primera versión que me salió guardaba el precio en el momento de agregar el producto, y después probé cambiando un precio en el admin y el total quedaba mal. Tuve que pensarlo un rato y cambiarlo para que siempre lea el precio de la BD.
+Para esta evaluación lo que más me gustó fue el formulario de consulta con sus validaciones. Antes habría hecho los chequeos con un montón de if repartidos en la vista o con JavaScript en el navegador, y ver que con `clean_nombre`, `clean_correo` y `clean_mensaje` quedaba todo en un solo lugar, con mensajes en español y sin tocar el template, cambió cómo voy a hacer los formularios de ahora en adelante. Los 19 casos de prueba que le armé me hicieron encontrar huecos que no había pensado, como el correo con un espacio al medio o un nombre que solo tenía puntos.
 
-Con la fixture me pasó algo parecido: la IA me generó los 40 productos bien, pero cuando lo metí al formato que pide Django el `loaddata` me tiraba error hasta que acomodé el modelo en minúsculas y los `pk`. También tenía un producto de más de la ES1 y tuve que sacarlo para cumplir exactamente 40. Al final entendí algo que antes no me quedaba claro: las migraciones no son "el script que crea la tabla una vez", son parte del proyecto; por eso hice una que crea el superusuario, porque si alguien clona el repo y solo corre `migrate`, el admin ya está ahí esperando. Eso de que el proyecto se pueda levantar desde cero sin tocar nada fue lo que más me gustó de esta evaluación.
+Lo que más me complicó fueron dos cosas del backend. La primera, la sesión de los últimos productos visitados: al principio, si abría el mismo producto dos veces se repetía en el historial, y tuve que dejarlo sin repetir y cortado en 3. La segunda, una franja de categorías en el landing que mostraba 40 categorías en vez de 6: pasé rato mirando el template hasta que vi que el problema era del ORM — el `ordering` del modelo hacía que el `distinct()` agrupara por id y no por categoría, y la solución fue ordenar explícitamente por categoría antes de agrupar.
+
+También me costó partir de una referencia de diseño ajena y adaptarla a mi proyecto sin romper el resto del sitio. Usar bloques en `base.html` (como los del footer y las clases de body y main) para cambiar solo el landing me salvó: las páginas internas siguieron iguales mientras el inicio se veía distinto. Al final, esta evaluación me dejó claro que el ORM y los formularios de Django hacen el trabajo pesado; a mí me queda pensar bien los datos, las reglas y cómo se ve todo al final.

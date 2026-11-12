@@ -13,3 +13,4 @@ build/
 *.swo
 *~
 .Pipfile.lock
+.claude/

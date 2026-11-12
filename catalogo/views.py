@@ -44,9 +44,23 @@ def _contexto_base(request):
 
 def landing_page(request):
     destacados = Producto.objects.order_by("-precio")[:4]
+    totales = Producto.objects.aggregate(total=Count("id"), stock=Sum("stock"))
+    categorias = list(
+        Producto.objects.order_by("categoria")
+        .values_list("categoria", flat=True)
+        .distinct()
+    )
+    stats = {
+        "total": totales["total"] or 0,
+        "categorias": len(categorias),
+        "stock": totales["stock"] or 0,
+        "criticos": Producto.objects.filter(stock__lte=UMBRAL_STOCK_CRITICO).count(),
+    }
     return render(request, "catalogo/landing.html", {
         **_contexto_base(request),
         "destacados": destacados,
+        "stats": stats,
+        "categorias": categorias,
     })
 
 

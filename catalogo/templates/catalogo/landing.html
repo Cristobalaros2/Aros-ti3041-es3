@@ -1,153 +1,300 @@
 {% extends "catalogo/base.html" %}
 {% load static %}
 
-{% block title %}Ferretería El Martillo — Tu aliado en construcción{% endblock %}
+{% block title %}Ferretería El Martillo — Herramientas y materiales{% endblock %}
+{% block body_class %}ls-landing{% endblock %}
+{% block main_class %}ls-main{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="hero-content">
-        <span class="hero-badge">🔩 Desde 1990</span>
-        <h1>Ferretería El Martillo</h1>
-        <p class="hero-sub">Tu aliado de confianza en construcción y hogar</p>
-        <p class="hero-desc">Más de 40 productos de calidad en herramientas, pinturas, plomería y electricidad. Los mejores precios para tus proyectos.</p>
-        <div class="hero-botones">
-            <a href="{% url 'catalogo:lista' %}" class="hero-btn-primary">Ver catálogo</a>
-            <a href="{% url 'catalogo:registro' %}" class="hero-btn-secondary">Crear cuenta</a>
+<div class="ls-progress" id="lsProgress" aria-hidden="true"></div>
+
+<section class="ls-hero" id="lsHero">
+    <div class="ls-tiles" id="lsTiles" aria-hidden="true">
+        <div class="ls-tile blur" style="--n:0; --glow:#2e7d5b; --d:0.5" data-depth="0.5">
+            <img src="{% static 'images/26-pintura.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile crisp" style="--n:1; --glow:#2b6cb0; --d:0.9" data-depth="0.9">
+            <img src="{% static 'images/10-taladro.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile blur" style="--n:2; --glow:#b7791f; --d:0.6" data-depth="0.6">
+            <img src="{% static 'images/16-compresor.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile crisp" style="--n:3; --glow:#8b5a2b; --d:1.1" data-depth="1.1">
+            <img src="{% static 'images/05-sierra-manual.jpg' %}" alt="">
+        </div>
+
+        <div class="ls-tile crisp" style="--n:4; --glow:#2d3748; --d:1.0" data-depth="1.0">
+            <img src="{% static 'images/38-cable.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile blur" style="--n:5; --glow:#3182ce; --d:0.7" data-depth="0.7">
+            <img src="{% static 'images/33-tubo-pvc.jpg' %}" alt="">
+        </div>
+
+        <div class="ls-tile blur" style="--n:6; --glow:#744210; --d:0.55" data-depth="0.55">
+            <img src="{% static 'images/01-martillo.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile crisp" style="--n:7; --glow:#4a5568; --d:0.95" data-depth="0.95">
+            <img src="{% static 'images/20-tornillos.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile crisp" style="--n:8; --glow:#2c7a7b; --d:0.65" data-depth="0.65">
+            <img src="{% static 'images/27-grifo-cocina.jpg' %}" alt="">
+        </div>
+        <div class="ls-tile blur" style="--n:9; --glow:#b7791f; --d:1.05" data-depth="1.05">
+            <img src="{% static 'images/40-lampara.jpg' %}" alt="">
         </div>
     </div>
-    <div class="hero-galeria">
-        <img src="{% static 'images/01-martillo.jpg' %}" alt="Martillo" class="hero-img">
-        <img src="{% static 'images/10-taladro.jpg' %}" alt="Taladro" class="hero-img">
-        <img src="{% static 'images/26-pintura.jpg' %}" alt="Pintura" class="hero-img">
-        <img src="{% static 'images/33-tubo-pvc.jpg' %}" alt="Tubo PVC" class="hero-img">
-    </div>
-    <div class="hero-stats">
-        <div class="stat">
-            <span class="stat-num">40+</span>
-            <span class="stat-label">Productos</span>
-        </div>
-        <div class="stat">
-            <span class="stat-num">6</span>
-            <span class="stat-label">Categorías</span>
-        </div>
-        <div class="stat">
-            <span class="stat-num">24h</span>
-            <span class="stat-label">Despacho</span>
+
+    <div class="ls-hero-texto">
+        <p class="ls-eyebrow">Desde 1990</p>
+        <h1>Todo para construir, en un solo lugar</h1>
+        <p class="ls-sub">{{ stats.total }} productos de calidad en herramientas, pinturas, plomería y electricidad. Los mejores precios para tus proyectos.</p>
+        <div class="ls-btns">
+            <a href="{% url 'catalogo:lista' %}" class="ls-btn ls-btn-dark">Ver catálogo</a>
+            <a href="{% url 'catalogo:registro' %}" class="ls-btn ls-btn-soft">Crear cuenta</a>
         </div>
     </div>
 </section>
 
-<section class="destacados">
-    <h2 class="section-title">Productos destacados</h2>
-    <p class="section-sub">Los más vendidos de nuestro catálogo</p>
-    <div class="dest-grid">
+<section class="ls-strip" aria-label="Categorías">
+    {% for c in categorias %}
+    <a href="{% url 'catalogo:lista' %}" class="ls-strip-item">{{ c }}</a>
+    {% endfor %}
+</section>
+
+<section class="ls-intro reveal">
+    <p>Ferretería El Martillo es la ferretería de confianza en construcción y hogar. Reunimos herramienta profesional, materiales y acabados de las mejores marcas para que tus proyectos salgan a la primera.</p>
+</section>
+
+<section class="ls-stats reveal" aria-label="Números de la ferretería">
+    <div class="ls-stat">
+        <span class="ls-stat-label">Productos</span>
+        <span class="ls-stat-num" data-count="{{ stats.total }}">{{ stats.total }}</span>
+    </div>
+    <div class="ls-stat">
+        <span class="ls-stat-label">Categorías</span>
+        <span class="ls-stat-num" data-count="{{ stats.categorias }}">{{ stats.categorias }}</span>
+    </div>
+    <div class="ls-stat">
+        <span class="ls-stat-label">Unidades en stock</span>
+        <span class="ls-stat-num" data-count="{{ stats.stock }}">{{ stats.stock }}</span>
+    </div>
+    <div class="ls-stat">
+        <span class="ls-stat-label">Stock crítico</span>
+        <span class="ls-stat-num" data-count="{{ stats.criticos }}">{{ stats.criticos }}</span>
+    </div>
+</section>
+
+<section class="ls-oferta">
+    <h2 class="ls-h2 reveal">Lo que ofrecemos</h2>
+
+    <article class="ls-fila reveal">
+        <div class="ls-fila-izq">
+            <span class="ls-fila-num">01</span>
+            <h3>Herramientas manuales</h3>
+            <p>Martillos, llaves, alicates, sierras y niveles para el trabajo diario.</p>
+        </div>
+        <div class="ls-fila-img" style="--glow:#b7791f">
+            <img src="{% static 'images/01-martillo.jpg' %}" alt="Herramientas manuales" loading="lazy">
+        </div>
+        <ul class="ls-fila-links">
+            <li><a href="{% url 'catalogo:lista' %}">Martillos <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Llaves y alicates <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Sierras <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Fijaciones <span>→</span></a></li>
+        </ul>
+    </article>
+
+    <article class="ls-fila reveal">
+        <div class="ls-fila-izq">
+            <span class="ls-fila-num">02</span>
+            <h3>Herramientas eléctricas</h3>
+            <p>Taladros, amoladoras, sierras circulares y lijadoras de alto rendimiento.</p>
+        </div>
+        <div class="ls-fila-img" style="--glow:#2b6cb0">
+            <img src="{% static 'images/10-taladro.jpg' %}" alt="Herramientas eléctricas" loading="lazy">
+        </div>
+        <ul class="ls-fila-links">
+            <li><a href="{% url 'catalogo:lista' %}">Taladros <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Amoladoras <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Sierras circulares <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Lijadoras <span>→</span></a></li>
+        </ul>
+    </article>
+
+    <article class="ls-fila reveal">
+        <div class="ls-fila-izq">
+            <span class="ls-fila-num">03</span>
+            <h3>Pintura y acabados</h3>
+            <p>Pinturas, esmaltes, rodillos, brochas, lijas y mascarillas.</p>
+        </div>
+        <div class="ls-fila-img" style="--glow:#c05621">
+            <img src="{% static 'images/26-pintura.jpg' %}" alt="Pintura y acabados" loading="lazy">
+        </div>
+        <ul class="ls-fila-links">
+            <li><a href="{% url 'catalogo:lista' %}">Pinturas <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Rodillos y brochas <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Lijas <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Cintas y mascarillas <span>→</span></a></li>
+        </ul>
+    </article>
+
+    <article class="ls-fila reveal">
+        <div class="ls-fila-izq">
+            <span class="ls-fila-num">04</span>
+            <h3>Plomería y electricidad</h3>
+            <p>Tubos PVC, conexiones, grifos, cables, interruptores y luminarias.</p>
+        </div>
+        <div class="ls-fila-img" style="--glow:#2c7a7b">
+            <img src="{% static 'images/33-tubo-pvc.jpg' %}" alt="Plomería y electricidad" loading="lazy">
+        </div>
+        <ul class="ls-fila-links">
+            <li><a href="{% url 'catalogo:lista' %}">Tubos y conexiones <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Grifos y llaves de paso <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Cables e interruptores <span>→</span></a></li>
+            <li><a href="{% url 'catalogo:lista' %}">Iluminación LED <span>→</span></a></li>
+        </ul>
+    </article>
+</section>
+
+<section class="ls-confianza">
+    <h2 class="ls-h2 reveal">Confían en nosotros</h2>
+    <div class="ls-cards reveal">
+        <div class="ls-card">
+            <span class="ls-card-top">Trayectoria</span>
+            <strong>36+</strong>
+            <p>años sirviendo a hogares, contratistas y emprendedores desde 1990.</p>
+        </div>
+        <div class="ls-card">
+            <span class="ls-card-top">Despacho</span>
+            <strong>24h</strong>
+            <p>entrega rápida a todo el país y retiro inmediato en tienda.</p>
+        </div>
+    </div>
+    <div class="ls-strip ls-strip-beneficios reveal" aria-label="Beneficios">
+        <span class="ls-strip-item">Despacho rápido</span>
+        <span class="ls-strip-item">Pago seguro</span>
+        <span class="ls-strip-item">Garantía en todos los productos</span>
+        <span class="ls-strip-item">Atención 24/7</span>
+    </div>
+</section>
+
+<section class="ls-destacados">
+    <div class="ls-destacados-head reveal">
+        <h2 class="ls-h2">Destacados</h2>
+        <div class="ls-btns">
+            <a href="{% url 'catalogo:lista' %}" class="ls-btn ls-btn-dark">Ver catálogo</a>
+            <a href="{% url 'catalogo:consulta' %}" class="ls-btn ls-btn-soft">Contacto</a>
+        </div>
+    </div>
+    <div class="ls-grid4">
         {% for p in destacados %}
-        <a href="{% url 'catalogo:detalle' p.id %}" class="dest-card">
-            <img src="{% static p.imagen %}" alt="{{ p.nombre }}" class="dest-img">
-            <div class="dest-info">
-                <h3>{{ p.nombre }}</h3>
-                <span class="dest-precio">${{ p.precio|floatformat:0 }}</span>
+        <a href="{% url 'catalogo:detalle' p.id %}" class="ls-prod reveal" style="--i:{{ forloop.counter0 }}">
+            <span class="ls-prod-cat">{{ p.categoria }}</span>
+            <h3>{{ p.nombre }}</h3>
+            <span class="ls-prod-precio">${{ p.precio|floatformat:0 }}</span>
+            <div class="ls-prod-img">
+                <img src="{% static p.imagen %}" alt="{{ p.nombre }}" loading="lazy">
             </div>
+            <span class="ls-prod-num">0{{ forloop.counter }}</span>
         </a>
         {% endfor %}
     </div>
 </section>
 
-<section class="categorias">
-    <h2 class="section-title">Nuestras categorías</h2>
-    <p class="section-sub">Todo lo que necesitas en un solo lugar</p>
-    <div class="cat-grid">
-        <a href="{% url 'catalogo:lista' %}" class="cat-card">
-            <div class="cat-img-wrap">
-                <img src="{% static 'images/05-sierra-manual.jpg' %}" alt="Herramientas" class="cat-img">
-            </div>
-            <div class="cat-texto">
-                <h3>Herramientas manuales</h3>
-                <p>Martillos, destornilladores, llaves y más</p>
-                <span class="cat-link">Ver productos →</span>
-            </div>
-        </a>
-        <a href="{% url 'catalogo:lista' %}" class="cat-card">
-            <div class="cat-img-wrap">
-                <img src="{% static 'images/11-amoladora.jpg' %}" alt="Herramientas eléctricas" class="cat-img">
-            </div>
-            <div class="cat-texto">
-                <h3>Herramientas eléctricas</h3>
-                <p>Taladros, amoladoras, sierras circulares</p>
-                <span class="cat-link">Ver productos →</span>
-            </div>
-        </a>
-        <a href="{% url 'catalogo:lista' %}" class="cat-card">
-            <div class="cat-img-wrap">
-                <img src="{% static 'images/20-tornillos.jpg' %}" alt="Fijaciones" class="cat-img">
-            </div>
-            <div class="cat-texto">
-                <h3>Fijaciones</h3>
-                <p>Tornillos, clavos, tarugos y anclajes</p>
-                <span class="cat-link">Ver productos →</span>
-            </div>
-        </a>
-        <a href="{% url 'catalogo:lista' %}" class="cat-card">
-            <div class="cat-img-wrap">
-                <img src="{% static 'images/26-pintura.jpg' %}" alt="Pinturas" class="cat-img">
-            </div>
-            <div class="cat-texto">
-                <h3>Pinturas y acabados</h3>
-                <p>Pinturas, brochas, rodillos y lijas</p>
-                <span class="cat-link">Ver productos →</span>
-            </div>
-        </a>
-        <a href="{% url 'catalogo:lista' %}" class="cat-card">
-            <div class="cat-img-wrap">
-                <img src="{% static 'images/33-tubo-pvc.jpg' %}" alt="Plomería" class="cat-img">
-            </div>
-            <div class="cat-texto">
-                <h3>Plomería</h3>
-                <p>Tubos PVC, conexiones, llaves de paso</p>
-                <span class="cat-link">Ver productos →</span>
-            </div>
-        </a>
-        <a href="{% url 'catalogo:lista' %}" class="cat-card">
-            <div class="cat-img-wrap">
-                <img src="{% static 'images/38-cable.jpg' %}" alt="Electricidad" class="cat-img">
-            </div>
-            <div class="cat-texto">
-                <h3>Electricidad</h3>
-                <p>Cables, interruptores, iluminación LED</p>
-                <span class="cat-link">Ver productos →</span>
-            </div>
-        </a>
-    </div>
+<section class="ls-cta reveal">
+    <a href="{% url 'catalogo:consulta' %}" class="ls-cta-link">
+        ¿Listo para tu proyecto? <span class="ls-cta-flecha">→</span>
+    </a>
+    <p class="ls-cta-sub">Escríbenos y te ayudamos a elegir los materiales exactos para tu obra o reparación.</p>
 </section>
+{% endblock %}
 
-<section class="beneficios">
-    <div class="beneficio">
-        <div class="ben-icon">🚚</div>
-        <h3>Despacho rápido</h3>
-        <p>Entrega en 24 horas a todo el país</p>
-    </div>
-    <div class="beneficio">
-        <div class="ben-icon">💳</div>
-        <h3>Pago seguro</h3>
-        <p>Múltiples medios de pago disponibles</p>
-    </div>
-    <div class="beneficio">
-        <div class="ben-icon">🛡️</div>
-        <h3>Garantía</h3>
-        <p>Todos nuestros productos con garantía</p>
-    </div>
-    <div class="beneficio">
-        <div class="ben-icon">📞</div>
-        <h3>Atención 24/7</h3>
-        <p>Estamos para ayudarte cuando nos necesites</p>
-    </div>
-</section>
+{% block extra_js %}
+<script>
+(function () {
+    const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-<section class="cta-final">
-    <div class="cta-contenido">
-        <h2>¿Listo para empezar tu proyecto?</h2>
-        <p>Explora nuestro catálogo y encuentra todo lo que necesitas al mejor precio</p>
-        <a href="{% url 'catalogo:lista' %}" class="cta-btn-final">Ir al catálogo →</a>
-    </div>
-</section>
+    const revelados = document.querySelectorAll('.reveal');
+    if (reducido || !('IntersectionObserver' in window)) {
+        revelados.forEach(function (el) { el.classList.add('is-visible'); });
+    } else {
+        const obs = new IntersectionObserver(function (entradas) {
+            entradas.forEach(function (e) {
+                if (e.isIntersecting) {
+                    e.target.classList.add('is-visible');
+                    obs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revelados.forEach(function (el) { obs.observe(el); });
+    }
+
+    const contadores = document.querySelectorAll('.ls-stat-num[data-count]');
+    function animar(el) {
+        const destino = parseInt(el.getAttribute('data-count'), 10) || 0;
+        if (reducido) { el.textContent = destino.toLocaleString('es-CL'); return; }
+        const dur = 1500;
+        const inicio = performance.now();
+        function paso(ahora) {
+            const av = Math.min((ahora - inicio) / dur, 1);
+            const suave = 1 - Math.pow(1 - av, 3);
+            el.textContent = Math.round(destino * suave).toLocaleString('es-CL');
+            if (av < 1) requestAnimationFrame(paso);
+        }
+        requestAnimationFrame(paso);
+    }
+    if (!reducido && 'IntersectionObserver' in window) {
+        contadores.forEach(function (el) { el.textContent = '0'; });
+        const obsC = new IntersectionObserver(function (entradas) {
+            entradas.forEach(function (e) {
+                if (e.isIntersecting) { animar(e.target); obsC.unobserve(e.target); }
+            });
+        }, { threshold: 0.5 });
+        contadores.forEach(function (el) { obsC.observe(el); });
+    }
+
+    const barra = document.getElementById('lsProgress');
+    function progreso() {
+        const alt = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = alt > 0 ? (window.scrollY / alt) * 100 : 0;
+        barra.style.width = Math.min(pct, 100) + '%';
+    }
+    window.addEventListener('scroll', progreso, { passive: true });
+    window.addEventListener('resize', progreso);
+    progreso();
+
+    const hero = document.getElementById('lsHero');
+    const tiles = document.querySelectorAll('.ls-tile');
+    if (!reducido && hero && tiles.length && window.matchMedia('(pointer: fine)').matches) {
+        let px = 0, py = 0, cx = 0, cy = 0, raf = null;
+        hero.addEventListener('mousemove', function (ev) {
+            const r = hero.getBoundingClientRect();
+            px = (ev.clientX - r.left) / r.width - 0.5;
+            py = (ev.clientY - r.top) / r.height - 0.5;
+            if (!raf) raf = requestAnimationFrame(loop);
+        });
+        hero.addEventListener('mouseleave', function () {
+            px = 0; py = 0;
+            if (!raf) raf = requestAnimationFrame(loop);
+        });
+        function loop() {
+            cx += (px - cx) * 0.06;
+            cy += (py - cy) * 0.06;
+            tiles.forEach(function (t) {
+                const d = parseFloat(t.getAttribute('data-depth')) || 1;
+                t.style.transform = 'translate(' + (-cx * 18 * d).toFixed(2) + 'px,' + (-cy * 14 * d).toFixed(2) + 'px)';
+            });
+            if (Math.abs(px - cx) > 0.001 || Math.abs(py - cy) > 0.001) {
+                raf = requestAnimationFrame(loop);
+            } else {
+                raf = null;
+            }
+        }
+    }
+})();
+</script>
 {% endblock %}

@@ -1253,3 +1253,799 @@ footer {
     font-size: 0.75rem;
     color: #888;
 }
+
+
+/* ================================================================
+   LANDING — ANIMACIONES Y MEJORA VISUAL
+   ================================================================ */
+
+/* --- Barra de progreso de scroll --- */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 0;
+    z-index: 9999;
+    background: linear-gradient(90deg, #f39c12, #2ecc71);
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.6);
+}
+
+/* --- Hero: fondo animado, capas y orbes --- */
+.hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    background-size: 200% 200%;
+    animation: hero-fondo 16s ease-in-out infinite;
+}
+.hero-content,
+.hero-galeria,
+.hero-stats {
+    position: relative;
+    z-index: 2;
+}
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: 1;
+    animation: orb-flotar 13s ease-in-out infinite;
+}
+.orb-uno {
+    width: 340px;
+    height: 340px;
+    background: #2e86c1;
+    opacity: 0.45;
+    top: -100px;
+    left: -100px;
+}
+.orb-dos {
+    width: 280px;
+    height: 280px;
+    background: #f39c12;
+    opacity: 0.3;
+    bottom: -80px;
+    right: 6%;
+    animation-delay: -4s;
+}
+.orb-tres {
+    width: 210px;
+    height: 210px;
+    background: #27ae60;
+    opacity: 0.28;
+    top: 45%;
+    right: -70px;
+    animation-delay: -8s;
+}
+
+/* --- Entrada escalonada del contenido del hero (solo CSS) --- */
+.hero-content > * {
+    opacity: 0;
+    animation: subir 0.8s cubic-bezier(0.22, 0.8, 0.36, 1) forwards;
+}
+.hero-content > *:nth-child(1) { animation-delay: 0.10s; }
+.hero-content > *:nth-child(2) { animation-delay: 0.22s; }
+.hero-content > *:nth-child(3) { animation-delay: 0.34s; }
+.hero-content > *:nth-child(4) { animation-delay: 0.46s; }
+.hero-content > *:nth-child(5) { animation-delay: 0.58s; }
+
+/* --- Galería del hero: entrada + flotación + parallax --- */
+.hero-float {
+    opacity: 0;
+    animation: aparecer 0.9s ease forwards;
+    animation-delay: calc(0.6s + var(--i, 0) * 0.15s);
+    will-change: transform;
+}
+.hero-img {
+    display: block;
+    animation: flotar 6.5s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -1.6s);
+    transition: filter 0.35s ease, box-shadow 0.35s ease;
+    cursor: pointer;
+}
+.hero-float:hover .hero-img {
+    animation-play-state: paused;
+    filter: brightness(1.12) saturate(1.15);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* --- Stats: zoom al pasar el cursor --- */
+.stat-num {
+    display: inline-block;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.stat:hover .stat-num {
+    transform: scale(1.12);
+    color: #2ecc71;
+}
+
+/* --- Reveal al hacer scroll (requiere JS: se activa con html.js) --- */
+.js .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 0.8, 0.36, 1);
+    transition-delay: calc(var(--i, 0) * 90ms);
+}
+.js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* --- Tarjetas de destacados: elevación, zoom y destello --- */
+.dest-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.dest-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 40px rgba(26, 82, 118, 0.25);
+}
+.dest-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
+    transform: translateX(-130%);
+    pointer-events: none;
+}
+.dest-card:hover::after {
+    animation: destello 0.9s ease forwards;
+}
+.dest-img {
+    transition: transform 0.5s ease;
+}
+.dest-card:hover .dest-img {
+    transform: scale(1.08);
+}
+.dest-precio {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+.dest-card:hover .dest-precio {
+    transform: translateX(5px);
+}
+
+/* --- Tarjetas de categorías --- */
+.cat-card {
+    position: relative;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.cat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 40px rgba(26, 82, 118, 0.2);
+}
+.cat-img-wrap {
+    position: relative;
+}
+.cat-img-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26, 82, 118, 0.5), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.cat-card:hover .cat-img-wrap::after {
+    opacity: 1;
+}
+.cat-card:hover .cat-img {
+    transform: scale(1.1);
+}
+.cat-link {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+.cat-card:hover .cat-link {
+    transform: translateX(6px);
+}
+
+/* --- Tarjetas de beneficios --- */
+.beneficio {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.beneficio::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f39c12, #2ecc71);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s ease;
+}
+.beneficio:hover::before {
+    transform: scaleX(1);
+}
+.beneficio:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+.ben-icon {
+    display: inline-block;
+    transition: transform 0.35s ease;
+}
+.beneficio:hover .ben-icon {
+    transform: translateY(-6px) scale(1.15) rotate(-8deg);
+}
+
+/* --- CTA final: degradado animado y botón pulsante --- */
+.cta-final {
+    background: linear-gradient(135deg, #1a5276, #2e86c1, #1a5276);
+    background-size: 200% 200%;
+    animation: gradiente-cta 10s ease infinite;
+}
+.cta-btn-final {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cta-btn-final:hover {
+    transform: translateY(-3px) scale(1.04);
+    animation: latido 1.5s ease-in-out infinite;
+}
+
+/* --- Scrollbar personalizado --- */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #eef1f4;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(#2e86c1, #1a5276);
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #1a5276;
+}
+
+/* --- Keyframes --- */
+@keyframes hero-fondo {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+@keyframes orb-flotar {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(35px, -30px) scale(1.07); }
+    66% { transform: translate(-30px, 25px) scale(0.94); }
+}
+@keyframes subir {
+    from { opacity: 0; transform: translateY(26px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes aparecer {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes flotar {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50% { transform: translateY(-16px) rotate(1.5deg); }
+}
+@keyframes destello {
+    to { transform: translateX(130%); }
+}
+@keyframes gradiente-cta {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+@keyframes latido {
+    0%, 100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+    50% { box-shadow: 0 4px 30px rgba(255, 255, 255, 0.55); }
+}
+
+/* --- Accesibilidad: respeta la preferencia de movimiento reducido --- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .hero-content > *,
+    .hero-float {
+        opacity: 1;
+        animation: none;
+    }
+    .js .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+
+/* ================================================================
+   LANDING v2 — ESTRUCTURA RENOVADA Y ANIMACIONES DESTACADAS
+   ================================================================ */
+
+/* --- Evita scroll horizontal por las bandas rotadas --- */
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* --- Intro / preloader (solo con JS) --- */
+.intro {
+    display: none;
+}
+.js .intro {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    background: radial-gradient(circle at 50% 40%, #203a43, #0f2027 72%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.1rem;
+    animation: intro-respaldo 0.01s linear 4.5s forwards;
+}
+.intro.saliendo {
+    animation: intro-salir 0.7s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+}
+.intro-martillo {
+    font-size: 4rem;
+    animation: intro-martillo 0.7s ease-in-out infinite;
+}
+.intro-texto {
+    color: #ffd66b;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+.intro-barra {
+    width: 210px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.intro-barra span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #f39c12, #2ecc71);
+    animation: intro-cargar 1.05s ease forwards;
+}
+
+/* --- Hero: layout de dos columnas --- */
+.hero {
+    text-align: left;
+    padding: 3.5rem 2rem 3rem;
+}
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 3rem;
+    align-items: center;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+.hero-content {
+    position: relative;
+    z-index: 3;
+}
+.hero .hero-titulo {
+    font-size: clamp(2.3rem, 5vw, 3.9rem);
+    line-height: 1.08;
+    color: #ffd66b;
+    text-shadow: 0 4px 26px rgba(255, 214, 107, 0.35);
+    margin: 0.6rem 0 0.7rem;
+}
+.hero-content > *:nth-child(1) { animation-delay: 1.30s; }
+.hero-content > *:nth-child(2) { animation: none; opacity: 1; }
+.hero-content > *:nth-child(3) { animation-delay: 1.45s; }
+.hero-content > *:nth-child(4) { animation-delay: 1.57s; }
+.hero-content > *:nth-child(5) { animation-delay: 1.69s; }
+.hero-botones {
+    justify-content: flex-start;
+}
+.hero-stats {
+    justify-content: flex-start;
+    margin-top: 3rem;
+    position: relative;
+    z-index: 3;
+}
+
+/* --- Título cinético: letras que entran una a una --- */
+.hero-titulo .letra {
+    display: inline-block;
+    opacity: 0;
+    animation: letra-entra 0.65s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards;
+}
+
+/* --- Spotlight que sigue el cursor --- */
+.hero-spotlight {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(430px circle at var(--mx, 72%) var(--my, 22%), rgba(255, 255, 255, 0.13), transparent 62%);
+}
+
+/* --- Marca de agua gigante deslizante --- */
+.hero-marca {
+    position: absolute;
+    left: 0;
+    bottom: 6px;
+    z-index: 1;
+    white-space: nowrap;
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.10);
+    animation: deslizar-marca 42s linear infinite;
+    pointer-events: none;
+}
+
+/* --- Collage 3D del hero --- */
+.hero-collage {
+    position: relative;
+    z-index: 2;
+}
+.collage-3d {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.35s ease-out;
+    opacity: 0;
+    animation: aparecer 1s ease 1.35s forwards;
+}
+.collage-item {
+    animation: flotar 7s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -1.7s);
+}
+.collage-item:nth-child(even) {
+    margin-top: 2rem;
+}
+.collage-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.collage-img:hover {
+    transform: scale(1.06);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+}
+.collage-chip {
+    position: absolute;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.96);
+    color: #1a5276;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.5rem 0.95rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+    animation: flotar 5s ease-in-out infinite;
+}
+.chip-uno {
+    top: -16px;
+    right: 4%;
+    animation-delay: -1.2s;
+}
+.chip-dos {
+    bottom: 14%;
+    left: -20px;
+    animation-delay: -3.4s;
+}
+
+/* --- Sello circular giratorio --- */
+.sello {
+    position: absolute;
+    left: -28px;
+    bottom: -26px;
+    width: 112px;
+    height: 112px;
+    z-index: 6;
+}
+.sello-svg {
+    width: 100%;
+    height: 100%;
+    animation: sello-girar 14s linear infinite;
+}
+.sello-texto {
+    fill: #ffd66b;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+}
+.sello-centro {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+}
+
+/* --- Banda diagonal con marquee infinito --- */
+.banda {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-top: 3.5rem;
+    margin-bottom: 4rem;
+    padding: 1rem 0;
+    background: #0f2027;
+    border-top: 2px solid rgba(255, 214, 107, 0.35);
+    border-bottom: 2px solid rgba(255, 214, 107, 0.35);
+    transform: rotate(-2.2deg) scale(1.02);
+    overflow: hidden;
+    z-index: 4;
+}
+.banda-pista {
+    display: flex;
+    width: max-content;
+    animation: correr 32s linear infinite;
+}
+.banda-texto {
+    padding-right: 2.5rem;
+    white-space: nowrap;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #ffd66b;
+}
+.banda-texto i {
+    font-style: normal;
+    color: #f39c12;
+    margin: 0 0.6rem;
+}
+
+/* --- Carrusel infinito de productos --- */
+.carrusel {
+    overflow: hidden;
+    margin: 1rem 0 4.5rem;
+}
+.carrusel-pista {
+    display: flex;
+    width: max-content;
+    animation: correr 60s linear infinite;
+    margin-top: 1rem;
+}
+.carrusel-pista:hover {
+    animation-play-state: paused;
+}
+.carrusel-item {
+    display: flex;
+    flex-direction: column;
+    width: 215px;
+    margin-right: 1.2rem;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.carrusel-item:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 18px 36px rgba(26, 82, 118, 0.25);
+}
+.carrusel-item img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+}
+.carrusel-nombre {
+    padding: 0.6rem 0.8rem 0.15rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a5276;
+}
+.carrusel-precio {
+    padding: 0 0.8rem 0.8rem;
+    font-weight: 800;
+    color: #27ae60;
+}
+
+/* --- Destacados: enlace "ver producto" al hacer hover --- */
+.dest-ver {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2e86c1;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.dest-card:hover .dest-ver {
+    opacity: 1;
+    transform: none;
+}
+
+/* --- Categorías en cuadrícula bento --- */
+.categorias .cat-grid {
+    grid-template-columns: repeat(6, 1fr);
+}
+.categorias .cat-card {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 330px;
+}
+.categorias .cat-card:nth-child(1) {
+    grid-column: span 4;
+}
+.categorias .cat-card:nth-child(6) {
+    grid-column: span 6;
+    min-height: 210px;
+    flex-direction: row;
+    align-items: stretch;
+}
+.categorias .cat-img-wrap {
+    height: auto;
+    flex: 1 1 auto;
+    min-height: 130px;
+}
+.categorias .cat-card:nth-child(6) .cat-img-wrap {
+    flex: 0 0 45%;
+}
+.categorias .cat-card:nth-child(6) .cat-texto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* --- CTA final: estrellas girando --- */
+.cta-final {
+    position: relative;
+    overflow: hidden;
+}
+.cta-estrella {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 2rem;
+    animation: estrella-girar 7s linear infinite;
+    pointer-events: none;
+}
+.estrella-una {
+    top: 18%;
+    left: 8%;
+}
+.estrella-dos {
+    bottom: 16%;
+    right: 9%;
+    font-size: 2.7rem;
+    animation-duration: 10s;
+    animation-delay: -3s;
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+    .hero {
+        text-align: center;
+    }
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+    }
+    .hero-botones,
+    .hero-stats {
+        justify-content: center;
+    }
+    .hero-collage {
+        max-width: 420px;
+        margin: 0 auto;
+    }
+    .adornos-btn {
+        display: none;
+    }
+    .banda-texto {
+        font-size: 0.95rem;
+    }
+    .categorias .cat-card,
+    .categorias .cat-card:nth-child(1),
+    .categorias .cat-card:nth-child(6) {
+        grid-column: span 6;
+        min-height: 330px;
+        flex-direction: column;
+    }
+    .categorias .cat-card:nth-child(6) .cat-img-wrap {
+        flex: 1 1 auto;
+    }
+}
+@media (max-width: 600px) {
+    .hero .hero-titulo {
+        font-size: 2.1rem;
+    }
+    .collage-chip {
+        display: none;
+    }
+    .carrusel-item {
+        width: 175px;
+    }
+}
+
+/* --- Keyframes de la versión 2 --- */
+@keyframes intro-respaldo {
+    to { opacity: 0; visibility: hidden; }
+}
+@keyframes intro-salir {
+    to { transform: translateY(-100%); }
+}
+@keyframes intro-martillo {
+    0%, 100% { transform: rotate(-18deg) scale(1); }
+    50% { transform: rotate(14deg) scale(1.18); }
+}
+@keyframes intro-cargar {
+    to { width: 100%; }
+}
+@keyframes letra-entra {
+    from { opacity: 0; transform: translateY(70px) rotate(-12deg) scale(0.5); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes deslizar-marca {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@keyframes sello-girar {
+    to { transform: rotate(360deg); }
+}
+@keyframes correr {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@keyframes estrella-girar {
+    0%, 100% { transform: rotate(0) scale(1); opacity: 0.45; }
+    50% { transform: rotate(180deg) scale(1.45); opacity: 1; }
+}
+
+/* --- Accesibilidad: movimiento reducido --- */
+@media (prefers-reduced-motion: reduce) {
+    .intro {
+        display: none !important;
+    }
+    .hero-titulo .letra {
+        opacity: 1 !important;
+        animation: none !important;
+    }
+    .collage-3d {
+        opacity: 1 !important;
+    }
+}
+
+
+/* --- Adornos (sello + chip) junto al botón "Crear cuenta" --- */
+.hero-botones {
+    align-items: center;
+}
+.adornos-btn {
+    position: relative;
+    flex: 0 0 auto;
+    width: 112px;
+    height: 112px;
+    margin-left: 2.4rem;
+    margin-top: 1.5rem;
+}
+.adornos-btn .sello {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+.adornos-btn .chip-dos {
+    top: 40px;
+    left: calc(100% + 14px);
+    right: auto;
+    bottom: auto;
+    white-space: nowrap;
+}
